@@ -1,2 +1,2 @@
 # gochain
-A Blockchain with Golang
+Blockchain with Golang

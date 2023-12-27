@@ -1,0 +1,132 @@
+{
+	"info": {
+		"_postman_id": "6dcaa469-841a-43e2-bd2b-e10fe6a3e575",
+		"name": "GoChain",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "12133068"
+	},
+	"item": [
+		{
+			"name": "Get Blocks",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{gochain}}:3000",
+					"host": [
+						"{{gochain}}"
+					],
+					"port": "3000"
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Transactions",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{gochain}}:3000/transactions",
+					"host": [
+						"{{gochain}}"
+					],
+					"port": "3000",
+					"path": [
+						"transactions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Mine",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{gochain}}:3000/mine",
+					"host": [
+						"{{gochain}}"
+					],
+					"port": "3000",
+					"path": [
+						"mine"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Start Auto Mining",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{gochain}}:3000/mine/start",
+					"host": [
+						"{{gochain}}"
+					],
+					"port": "3000",
+					"path": [
+						"mine",
+						"start"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Token Balance",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{gochain}}:3000/balance?blockchain_address=15iFYhB7Xv4SkZhwFkkmns7V37QCmr7pMn&token_name=CRP",
+					"host": [
+						"{{gochain}}"
+					],
+					"port": "3000",
+					"path": [
+						"balance"
+					],
+					"query": [
+						{
+							"key": "blockchain_address",
+							"value": "15iFYhB7Xv4SkZhwFkkmns7V37QCmr7pMn"
+						},
+						{
+							"key": "token_name",
+							"value": "CRP"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Wallet Balances",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{gochain}}:3000/balances_all?blockchain_address=15iFYhB7Xv4SkZhwFkkmns7V37QCmr7pMn",
+					"host": [
+						"{{gochain}}"
+					],
+					"port": "3000",
+					"path": [
+						"balances_all"
+					],
+					"query": [
+						{
+							"key": "blockchain_address",
+							"value": "15iFYhB7Xv4SkZhwFkkmns7V37QCmr7pMn"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

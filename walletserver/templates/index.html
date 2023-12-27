@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <meta name="generator" content="Hugo 0.104.2" />
+    <title>Wallet</title>
+
+    <link
+      href="https://getbootstrap.com/docs/5.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65"
+      crossorigin="anonymous"
+    />
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+    <script>
+ 
+        $(function () {
+            console.log('start calling backend ... ')
+            $.ajax({
+                url: '/wallet',
+                type: 'POST',
+                success: function (response) {
+                    $('#public_key').val(response['public_key']);
+                    $('#private_key').val(response['private_key']);
+                    $('#blockchain_address').val(response['blockchain_address']);
+                    console.log(response);
+                },
+                error : function(error) {
+                    console.log(error);
+                }
+            })
+ 
+            $('#send_money_button').click(function () {
+              let confirm_message = 'Are you sure you want to send?';
+              let confirmResult = confirm(confirm_message)
+              if(confirmResult !== true) {
+                alert('It is been cancelled');
+                return
+              }
+
+              let transaction_data = {
+                'sender_private_key' : $('#private_key').val(),
+                'sender_public_key' : $('#public_key').val(),
+                'sender_blockchain_address' : $('#blockchain_address').val(),
+                'recipient_blockchain_address' : $('#recipient_blockchain_address').val(),
+                'token_name' : $('#token_name').val(),
+                'token_value' : $('#token_value').val()
+              }
+
+              $.ajax( {
+                url: '/transaction',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(transaction_data),
+                success: function(response) {
+                  console.info(response);
+                  if(response.message == 'fail') {
+                    alert('failed')
+                    return
+                  } else {
+                    alert('Successful transaction')
+                  }
+                },
+                error: function (response) {
+                  alert('Transaction error')
+                  console.error(response)
+                }
+              })
+            })
+
+            function reload_amount() {
+              //console.info('reloading wallet...')
+                 let data = {'blockchain_address': $('#blockchain_address').val()}
+                 $.ajax({
+                     url: '/balance',
+                     type: 'GET',
+                     data: data,
+                     success: function (response) {
+                         let amount = response['amount'];
+                         const list = document.getElementById('tokens');
+                         list.innerHTML = amount.filter( x => parseFloat(x.token_value) !== 0 ).map(item => ` <li class="list-group-item d-flex justify-content-between lh-sm">
+                    <div>
+                      <h6 class="my-0">${item.token_name}</h6>
+                    </div>
+                    <span class="text-muted">${item.token_value}</span>
+                  </li>`).join('');
+                         //console.info(amount)
+                     },
+                     error: function(error) {
+                         console.error(error)
+                     }
+                 })
+             }
+
+             $('#reload_wallet').click(function(){
+                 reload_amount();
+             });
+
+
+             setInterval(reload_amount, 2000)
+
+        })
+
+    </script>
+
+    <meta name="theme-color" content="#712cf9" />
+
+    <style>
+      body {
+        background-image: linear-gradient(180deg, #eee, #fff 100px, #fff);
+      }
+
+      .container {
+        max-width: 960px;
+      }
+
+      .pricing-header {
+        max-width: 700px;
+      }
+      .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        user-select: none;
+      }
+
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+
+      .b-example-divider {
+        height: 3rem;
+        background-color: rgba(0, 0, 0, 0.1);
+        border: solid rgba(0, 0, 0, 0.15);
+        border-width: 1px 0;
+        box-shadow: inset 0 0.5em 1.5em rgba(0, 0, 0, 0.1),
+          inset 0 0.125em 0.5em rgba(0, 0, 0, 0.15);
+      }
+
+      .b-example-vr {
+        flex-shrink: 0;
+        width: 1.5rem;
+        height: 100vh;
+      }
+
+      .bi {
+        vertical-align: -0.125em;
+        fill: currentColor;
+      }
+
+      .nav-scroller {
+        position: relative;
+        z-index: 2;
+        height: 2.75rem;
+        overflow-y: hidden;
+      }
+
+      .nav-scroller .nav {
+        display: flex;
+        flex-wrap: nowrap;
+        padding-bottom: 1rem;
+        margin-top: -1px;
+        overflow-x: auto;
+        text-align: center;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+      }
+    </style>
+  </head>
+  <body class="bg-light">
+    <div class="container">
+      <main>
+        <div class="py-5 text-center">
+          <h2>Wallet form</h2>
+          <p class="lead">
+            Below is an example form built for wallet signature and tx
+            verification.
+          </p>
+        </div>
+
+        <div class="row g-5">
+            <div class="col-md-5 col-lg-4 order-md-last">
+                <h4 class="d-flex justify-content-between align-items-center mb-3">
+                  <span class="text-primary">Wallet</span>
+                </h4>
+                <ul class="list-group mb-3">
+                  <li class="list-group-item d-flex justify-content-between lh-sm">
+                    <div>
+                      <h6 class="my-0">Token name</h6>
+                    </div>
+                    <span class="text-muted">Value</span>
+                  </li>
+                </ul>
+                <ul class="list-group mb-3" id="tokens">
+                 
+                </ul>
+    
+                <div class="input-group">
+                  <button
+                    id="reload_wallet"
+                    type="submit"
+                    class="btn btn-primary"
+                  >
+                    Reload Wallet
+                  </button>
+                </div>
+              </div>
+          <div class="col-md-7 col-lg-8">
+            <h4 class="mb-3">Transaction</h4>
+            <form class="needs-validation" novalidate>
+              <div class="row g-3">
+
+                <div class="col-12">
+                  <label for="public_key" class="form-label">Public Key</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="public_key"
+                    placeholder=""
+                    required
+                  />
+                  <div class="invalid-feedback">
+                    Please enter your public key.
+                  </div>
+                </div>
+
+                <div class="col-12">
+                  <label for="private_key" class="form-label">Private Key</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="private_key"
+                    placeholder=""
+                    required
+                  />
+                  <div class="invalid-feedback">
+                    Please enter your private key.
+                  </div>
+                </div>
+
+                <div class="col-12">
+                  <label for="blockchain_address" class="form-label">Blockchain Address</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="blockchain_address"
+                    placeholder=""
+                    required
+                  />
+                  <div class="invalid-feedback">
+                    Please enter your blockchain address
+                  </div>
+                </div>
+
+              </div>
+
+              <hr class="my-4" />
+
+              <h4 class="mb-3">Send To</h4>
+
+              <div class="row gy-3">
+                <div class="col-12">
+                    <label for="recipient_blockchain_address" class="form-label">Blockchain Address</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="recipient_blockchain_address"
+                      placeholder=""
+                      required
+                    />
+                    <div class="invalid-feedback">
+                      Please enter your recipient blockchain address
+                    </div>
+                  </div>
+
+                </div>
+
+                <hr class="my-4" />
+
+                <div class="col-md-3">
+                  <label for="token_name" class="form-label"
+                    >Token Name</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="token_name"
+                    placeholder=""
+                    required
+                  />
+                  <div class="invalid-feedback">Token name is required</div>
+                </div>
+
+                <div class="col-md-3">
+                  <label for="token_value" class="form-label">Token Value</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="token_value"
+                    placeholder=""
+                    required
+                  />
+                  <div class="invalid-feedback">Token value is required</div>
+                </div>
+
+                <hr class="my-4" />
+
+                <button class="btn btn-primary" id="send_money_button">Send Token</button>
+
+                <hr class="my-4" />
+
+
+
+              </div>
+
+            </form>
+          </div>
+        </div>
+      </main>
+ 
+    </div>
+
+    <script
+      src="https://getbootstrap.com/docs/5.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
+      crossorigin="anonymous"
+    ></script>
+
+    <script>
+      (() => {
+        "use strict";
+
+        const forms = document.querySelectorAll(".needs-validation");
+
+        Array.from(forms).forEach((form) => {
+          form.addEventListener(
+            "submit",
+            (event) => {
+              if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+              }
+              form.classList.add("was-validated");
+              event.preventDefault();
+            },
+            false
+          );
+        });
+      })();
+    </script>
+  </body>
+</html>
